@@ -4,7 +4,7 @@ library(ggplot2)
 library(dplyr)
 library(DT)
 
-iowa <- read.csv("data/bcl-data.csv", stringsAsFactors = FALSE)
+bcl <- read.csv("data/bcl-data.csv", stringsAsFactors = FALSE)
 
 ui <- fluidPage(
   titlePanel("BC Liquor Store prices"),
@@ -39,7 +39,7 @@ server <- function(input, output) {
     
     bcl %>%
     filter(Price >= input$priceInput[1],
-           Price <- input$priceInput[2],
+           Price <= input$priceInput[2],
            Type == input$typeInput,
            Country == input$countryInput
     )
