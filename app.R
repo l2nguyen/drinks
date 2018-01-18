@@ -21,7 +21,9 @@ ui <- fluidPage(
   ),
     
     mainPanel(
-      h2(textOutput("textHead")),
+      h3(textOutput("textHead")),
+      downloadButton("download", "Download results"),
+      br(),
       plotOutput("coolplot"),
       br(), br(),
       DT::dataTableOutput("results")
@@ -45,6 +47,16 @@ server <- function(input, output) {
     )
   })
   
+  output$textHead <- renderText({
+    numResult <- nrow(filtered())
+    if (is.null(numResult)) {
+      numResult <- 0
+    }
+    
+    paste("Search result: ", numResult, " items")
+    
+  })  
+  
   output$coolplot <- renderPlot({
     
     if (is.null(filtered())) {
@@ -58,26 +70,28 @@ server <- function(input, output) {
   
   output$results <- DT::renderDataTable({
     filtered()
-    
     })
   
-  output$textHead <- renderText({
-    paste("Result for:", input$typeInput, "from", input$countryInput)
-  
-  })
+  output$download <- downloadHandler(
+    filename = function() {
+      "bcl-results.csv"
+    },
+    content = function(file) {
+      write.csv(filtered(), file)
+      })
   
   output$countryOutput <- renderUI({
     selectInput("countryInput", "Country",
                 sort(unique(bcl$Country)),
                 selected = "CANADA")
-    
-  })
+    })
   
   output$typeOutput <- renderUI({
     selectInput("typeInput", "Product Type",
     choices = sort(unique(bcl$Type)),
+    multiple = TRUE,
     selected = "WINE")
-  })
+    })
   
 }
 
